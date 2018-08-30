@@ -17,7 +17,7 @@ VGGFACE2 is a large-scale face dataset with 9,000+ identities and 3.3 million+ f
 Follow the [instruction](http://zeus.robots.ox.ac.uk/vgg_face2/) to download VGGFACE2 Dataset.
 
 ## Architecture
-![image](https://github.com/foamliu/FaceNet/raw/master/images/model.png)
+![image](https://github.com/foamliu/FaceNet-v2/raw/master/images/model.png)
 
 ## Usage
 ### Data Pre-processing
