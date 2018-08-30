@@ -12,12 +12,12 @@ This is a Keras implementation of the face recognizer described in the paper [Fa
 
 VGGFACE2 is a large-scale face dataset with 9,000+ identities and 3.3 million+ face images.
 
-![image](https://github.com/foamliu/FaceNet/raw/master/images/vggface2.png)
+![image](https://github.com/foamliu/FaceNet-v2/raw/master/images/vggface2.png)
 
 Follow the [instruction](http://zeus.robots.ox.ac.uk/vgg_face2/) to download VGGFACE2 Dataset.
 
 ## Architecture
-![image](https://github.com/foamliu/FaceNet/raw/master/images/model.png)
+![image](https://github.com/foamliu/FaceNet-v2/raw/master/images/model.png)
 
 ## Usage
 ### Data Pre-processing
