@@ -43,13 +43,13 @@ def check_one_image(filename):
         return filename
 
     # Find the 5 face landmarks we need to do the alignment.
-    faces = dlib.full_object_detections()
-    for detection in dets:
-        faces.append(sp(img, detection))
-
-    # It is also possible to get a single chip
-    image = dlib.get_face_chip(img, faces[0], size=img_size)
-    image = image[:, :, ::-1]
+    # faces = dlib.full_object_detections()
+    # for detection in dets:
+    #     faces.append(sp(img, detection))
+    #
+    # # It is also possible to get a single chip
+    # image = dlib.get_face_chip(img, faces[0], size=img_size)
+    # image = image[:, :, ::-1]
 
 
 def check_images(usage):
@@ -62,7 +62,7 @@ def check_images(usage):
         fileset += files
     print('usage:{}, files:{}'.format(usage, len(fileset)))
 
-    pool = Pool(24)
+    pool = Pool(12)
     results = []
     for item in tqdm(pool.imap_unordered(check_one_image, fileset), total=len(fileset)):
         results.append(item)
