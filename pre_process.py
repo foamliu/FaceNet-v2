@@ -8,7 +8,7 @@ def extract(folder):
     filename = 'data/{}.tar.gz'.format(folder)
     print('Extracting {}...'.format(filename))
     with tarfile.open(filename) as tar:
-        tar.extractall()
+        tar.extractall('data')
 
 
 if __name__ == '__main__':
