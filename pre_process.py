@@ -5,11 +5,10 @@ from utils import ensure_folder
 
 
 def extract(folder):
-    filename = '{}.tar.gz'.format(folder)
+    filename = 'data/{}.tar.gz'.format(folder)
     print('Extracting {}...'.format(filename))
-    tar = tarfile.open(filename)
-    tar.extractall()
-    tar.close()
+    with tarfile.open(filename) as tar:
+        tar.extractall()
 
 
 if __name__ == '__main__':
