@@ -1,3 +1,4 @@
+import bz2
 import os
 import tarfile
 from multiprocessing import Pool
@@ -22,6 +23,14 @@ def ensure_dlib_model():
         import urllib.request
         urllib.request.urlretrieve("http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2",
                                    filename="models/shape_predictor_5_face_landmarks.dat.bz2")
+
+
+def extract_bz2(new):
+    old = '{}.bz2'.format(new)
+    print('Extracting {}...'.format(old))
+    with open(new, 'wb') as new_file, bz2.BZ2File(old, 'rb') as file:
+        for data in iter(lambda: file.read(100 * 1024), b''):
+            new_file.write(data)
 
 
 def check_one_image(filename):
@@ -69,11 +78,12 @@ def check_images(usage):
 if __name__ == '__main__':
     ensure_folder('data')
     ensure_folder('models')
+    ensure_dlib_model()
+    extract_bz2(predictor_path)
     if not os.path.isdir('data/test'):
         extract('data/vggface2_test.tar.gz')
     if not os.path.isdir('data/train'):
         extract('data/vggface2_train.tar.gz')
-    ensure_dlib_model()
 
     # Load all the models we need: a detector to find the faces, a shape predictor
     # to find face landmarks so we can precisely localize the face
