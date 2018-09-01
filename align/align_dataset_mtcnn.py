@@ -34,6 +34,7 @@ from time import sleep
 import numpy as np
 import tensorflow as tf
 from scipy import misc
+from tqdm import tqdm
 
 import align.detect_face
 import facenet
@@ -70,7 +71,7 @@ def main(args):
         nrof_successfully_aligned = 0
         if args.random_order:
             random.shuffle(dataset)
-        for cls in dataset:
+        for cls in tqdm(dataset):
             output_class_dir = os.path.join(output_dir, cls.name)
             if not os.path.exists(output_class_dir):
                 os.makedirs(output_class_dir)
@@ -156,7 +157,8 @@ def parse_arguments(argv):
     parser.add_argument('--random_order',
                         help='Shuffles the order of images to enable alignment using multiple processes.',
                         action='store_true')
-    parser.add_argument('--gpu_memory_fraction', type=float,
+    parser.add_argument('--gpu_memory_fract'
+                        'ion', type=float,
                         help='Upper bound on the amount of GPU memory that will be used by the process.', default=1.0)
     parser.add_argument('--detect_multiple_faces', type=bool,
                         help='Detect and align multiple faces per image.', default=False)

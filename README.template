@@ -1,50 +1,95 @@
 # FaceNet
 
-This is a Keras implementation of the face recognizer described in the paper [FaceNet: A Unified Embedding for Face Recognition and Clustering](https://arxiv.org/abs/1503.03832).
+这是 FaceNet 的Keras实现 [FaceNet: A Unified Embedding for Face Recognition and Clustering](https://arxiv.org/abs/1503.03832).
 
-## Dependencies
-- [NumPy](http://docs.scipy.org/doc/numpy-1.10.1/user/install.html)
-- [Tensorflow](https://www.tensorflow.org/versions/r0.8/get_started/os_setup.html)
-- [Keras](https://keras.io/#installation)
-- [OpenCV](https://opencv-python-tutroals.readthedocs.io/en/latest/)
+与 [FaceNet](https://github.com/foamliu/FaceNet) 主要差别：
+1. 输入图片尺寸 139 -> 224。
+2. 训练数据集 CelebA -> VGGFACE2。
+3. 标定模型 Dlib -> [MTCNN](https://github.com/davidsandberg/facenet/tree/master/src/align).
 
-## Dataset
 
-VGGFACE2 is a large-scale face dataset with 9,000+ identities and 3.3 million+ face images.
+## 软件兼容性
+- Python 3.5
+- Tensorflow 1.6.0
+- Keras 2.2.0
+
+
+## 数据集
+
+VGGFACE2 是一个大型的人脸数据集，有9,000多个人物身份和330多万张人脸图像。
 
 ![image](https://github.com/foamliu/FaceNet-v2/raw/master/images/vggface2.png)
 
-Follow the [instruction](http://zeus.robots.ox.ac.uk/vgg_face2/) to download VGGFACE2 Dataset.
+按照 [说明](http://zeus.robots.ox.ac.uk/vgg_face2/) 下载 VGGFACE2 数据集 vggface2_train.tar.gz 和 vggface2_test.tar.gz 放入 data 目录。
 
-## Architecture
+## 模型结构
 ![image](https://github.com/foamliu/FaceNet-v2/raw/master/images/model.png)
 
-## Usage
-### Data Pre-processing
-Extract training images:
+## 工作流程
+处理单个输入图像的工作流程如下：
+
+1. 人脸检测：使用 Dlib 中预先训练的模型检测面部。
+2. 人脸校准：使用 Dlib 的实时姿势估计与 OpenCV 的仿射变换来尝试使眼睛和下唇在每个图像上出现在相同位置。
+3. 卷积网络：使用深度神经网络把人脸图片映射为 128 维单位超球面上的一个点。
+
+![image](https://github.com/foamliu/FaceNet-v2/raw/master/images/summary.jpg)
+[图片来源](https://cmusatyalab.github.io/openface/)
+
+## 性能评估
+
+使用 Labeled Faces in the Wild (LFW) 数据集做性能评估:
+
+- 13233 人脸图片
+- 5749 人物身份
+- 1680 人有两张以上照片
+
+### 准备数据
+下载 [LFW database](http://vis-www.cs.umass.edu/lfw/lfw-funneled.tgz) 放在 data 目录下:
+
 ```bash
-$ python pre-process.py
+$ wget http://vis-www.cs.umass.edu/lfw/lfw-funneled.tgz
+$ tar -xvf lfw-funneled.tgz
+$ wget http://vis-www.cs.umass.edu/lfw/pairs.txt
+$ wget http://vis-www.cs.umass.edu/lfw/people.txt
 ```
 
-### Train
+### 评估脚本
+```bash
+$ python lfw_eval.py
+```
+
+### 测得结果
+准确度: **89.27 %**.
+
+## 如何使用
+### 数据预处理
+提取训练图像:
+```bash
+$ python pre-process.py
+
+执行下面命令标定人脸：
+```bash
+$ python align/align_dataset_mtcnn.py data/train data/train_aligned --image_size 200 --margin 24
+$ python align/align_dataset_mtcnn.py data/test data/test_aligned --image_size 200 --margin 24
+```
+
+### 训练
 ```bash
 $ python train.py
 ```
 
-If you want to visualize during training, run in your terminal:
+要想可视化训练过程，执行下面命令：
 ```bash
 $ tensorboard --logdir path_to_current_dir/logs
 ```
 
-### Demo
-
-Download [pre-trained model](https://github.com/foamliu/Look-Into-Person/releases/download/v1.0/model.119-2.2473.hdf5) and put it into models folder.
+### DEMO
 
 ```bash
 $ python demo.py
 ```
 
-P | distance | A | distance | N |
+正(P) | 欧式距离 | 锚(A) | 欧式距离 | 反(N) |
 |---|---|---|---|---|
 |![image](https://github.com/foamliu/FaceNet/raw/master/images/0_p_image.png)|$(distance_0_a_p)|![image](https://github.com/foamliu/FaceNet/raw/master/images/0_a_image.png)|$(distance_0_a_n)|![image](https://github.com/foamliu/FaceNet/raw/master/images/0_n_image.png)|
 |$(distance_0_1_p)|---|$(distance_0_1_a)|---|$(distance_0_1_n)|
@@ -66,29 +111,34 @@ P | distance | A | distance | N |
 |$(distance_8_9_p)|---|$(distance_8_9_a)|---|$(distance_8_9_n)|
 |![image](https://github.com/foamliu/FaceNet/raw/master/images/9_p_image.png)|$(distance_9_a_p)|![image](https://github.com/foamliu/FaceNet/raw/master/images/9_a_image.png)|$(distance_9_a_n)|![image](https://github.com/foamliu/FaceNet/raw/master/images/9_n_image.png)|
 
-### Evaluation
 
-Labeled Faces in the Wild (LFW) database info:
+## 附录
 
-- 13233 images
-- 5749 people
-- 1680 people with two or more images
-
-Download the [LFW database](http://vis-www.cs.umass.edu/lfw/lfw-funneled.tgz) and put it under data folder:
-
+### 样本数据
+执行下面命令查看样本数据：
 ```bash
-$ wget http://vis-www.cs.umass.edu/lfw/lfw-funneled.tgz
-$ tar -xvf lfw-funneled.tgz
-$ wget http://vis-www.cs.umass.edu/lfw/pairs.txt
-$ wget http://vis-www.cs.umass.edu/lfw/people.txt
-
-$ python lfw_eval.py
+$ python data_generator.py
 ```
+正(P) | 锚(A) | 反(N) |
+|---|---|---|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_0.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_0.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_0.jpg)|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_1.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_1.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_1.jpg)|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_2.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_2.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_2.jpg)|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_3.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_3.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_3.jpg)|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_4.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_4.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_4.jpg)|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_5.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_5.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_5.jpg)|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_6.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_6.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_6.jpg)|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_7.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_7.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_7.jpg)|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_8.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_8.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_8.jpg)|
+|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_p_9.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_a_9.jpg)|![image](https://github.com/foamliu/FaceNet/raw/master/images/sample_n_9.jpg)|
 
-Accuracy is: 89.27 %.
 
-### Image Augmentation
-before | after | before | after | before | after |
+### 数据增强
+执行下面命令查看数据增强效果：
+```bash
+$ python data_generator.py
+```
+之前 | 之后 | 之前 | 之后 | 之前 | 之后 |
 |---|---|---|---|---|---|
 |![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_before_0.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_after_0.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_before_1.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_after_1.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_before_2.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_after_2.png)|
 |![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_before_3.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_after_3.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_before_4.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_after_4.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_before_5.png)|![image](https://github.com/foamliu/FaceNet/raw/master/images/imgaug_after_5.png)|
