@@ -81,7 +81,7 @@ def main(args):
                 nrof_images_total += 1
                 filename = os.path.splitext(os.path.split(image_path)[1])[0]
                 output_filename = os.path.join(output_class_dir, filename + '.png')
-                print(image_path)
+                # print(image_path)
                 if not os.path.exists(output_filename):
                     try:
                         img = misc.imread(image_path)
