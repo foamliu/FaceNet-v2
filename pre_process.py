@@ -1,13 +1,11 @@
-import bz2
 import os
 import tarfile
 from multiprocessing import Pool
 
 import cv2 as cv
-import mtcnn
+from mtcnn.mtcnn import MTCNN
 from tqdm import tqdm
 
-from config import img_size
 from utils import ensure_folder
 
 
@@ -20,20 +18,11 @@ def extract(filename):
 def check_one_image(filename):
     img = cv.imread(filename)
     img = img[:, :, ::-1]
-    dets = detector(img, 1)
-
-    num_faces = len(dets)
+    detector = MTCNN()
+    faces = detector.detect_faces(img)
+    num_faces = len(faces)
     if num_faces == 0:
         return filename
-
-    # Find the 5 face landmarks we need to do the alignment.
-    # faces = dlib.full_object_detections()
-    # for detection in dets:
-    #     faces.append(sp(img, detection))
-    #
-    # # It is also possible to get a single chip
-    # image = dlib.get_face_chip(img, faces[0], size=img_size)
-    # image = image[:, :, ::-1]
 
 
 def check_images(usage):
@@ -55,7 +44,7 @@ def check_images(usage):
 
     results = [r for r in results if r is not None]
     print(len(results))
-    with open('data/exclude.txt', 'w') as file:
+    with open('data/exclude_{}.txt'.format(usage), 'w') as file:
         file.write('\n'.join(results))
 
 
@@ -65,8 +54,6 @@ if __name__ == '__main__':
 
     extract('data/vggface2_test.tar.gz')
     extract('data/vggface2_train.tar.gz')
-
-
 
     check_images('train')
     check_images('test')
