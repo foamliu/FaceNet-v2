@@ -9,7 +9,7 @@ num_identities = 10177
 valid_ratio = 0.005
 num_train_samples = 200001
 num_valid_samples = 2598
-predictor_path = 'models/shape_predictor_5_face_landmarks.dat'
+
 
 alpha = 0.2
 SENTINEL = 1
