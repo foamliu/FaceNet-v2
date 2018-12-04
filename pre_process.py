@@ -3,9 +3,9 @@ import tarfile
 from multiprocessing import Pool
 
 import cv2 as cv
-from mtcnn.mtcnn import MTCNN
 from tqdm import tqdm
 
+from mtcnn.detector import detect_faces
 from utils import ensure_folder
 
 
@@ -18,9 +18,8 @@ def extract(filename):
 def check_one_image(filename):
     img = cv.imread(filename)
     img = img[:, :, ::-1]
-    detector = MTCNN()
-    faces = detector.detect_faces(img)
-    num_faces = len(faces)
+    bounding_boxes, landmarks = detect_faces(img)
+    num_faces = len(bounding_boxes)
     if num_faces == 0:
         return filename
 
