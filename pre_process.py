@@ -51,8 +51,8 @@ if __name__ == '__main__':
     ensure_folder('data')
     ensure_folder('models')
 
-    # extract('data/vggface2_test.tar.gz')
-    # extract('data/vggface2_train.tar.gz')
+    extract('data/vggface2_test.tar.gz')
+    extract('data/vggface2_train.tar.gz')
 
-    # check_images('train')
+    check_images('train')
     check_images('test')
