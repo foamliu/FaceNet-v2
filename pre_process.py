@@ -1,6 +1,5 @@
 import os
 import tarfile
-from multiprocessing import Pool
 
 import cv2 as cv
 from tqdm import tqdm
@@ -34,14 +33,19 @@ def check_images(usage):
         fileset += files
     print('usage:{}, files:{}'.format(usage, len(fileset)))
 
-    pool = Pool(12)
     results = []
-    for item in tqdm(pool.imap_unordered(check_one_image, fileset), total=len(fileset)):
-        results.append(item)
-    pool.close()
-    pool.join()
+    # pool = Pool(12)
+    # for item in tqdm(pool.imap_unordered(check_one_image, fileset), total=len(fileset)):
+    #     results.append(item)
+    # pool.close()
+    # pool.join()
+    # results = [r for r in results if r is not None]
 
-    results = [r for r in results if r is not None]
+    for item in tqdm(fileset):
+        ret = check_one_image(item)
+        if ret is not None:
+            results.append(ret)
+
     print(len(results))
     with open('data/exclude_{}.txt'.format(usage), 'w') as file:
         file.write('\n'.join(results))
