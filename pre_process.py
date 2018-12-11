@@ -1,7 +1,7 @@
 import os
 import tarfile
 
-import cv2 as cv
+from PIL import Image
 from tqdm import tqdm
 
 from mtcnn.detector import detect_faces
@@ -15,8 +15,7 @@ def extract(filename):
 
 
 def check_one_image(filename):
-    img = cv.imread(filename)
-    img = img[:, :, ::-1]
+    img = Image.open(filename)
     bounding_boxes, landmarks = detect_faces(img)
     num_faces = len(bounding_boxes)
     if num_faces == 0:
